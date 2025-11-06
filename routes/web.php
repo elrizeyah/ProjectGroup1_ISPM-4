@@ -172,10 +172,9 @@ Route::get('/transaction-record', function () {
 })->name('transaction-record');
 
 Route::get('/inventory1', function () {
-    $transactions = Transaction::latest()->take(10)->get();
-
+    $products = Product::latest()->take(10)->get();
     return Inertia::render('Reports/Inventory1', [
-        'transactions' => $transactions,
+        'products' => $products,
     ]);
 })->name('inventory1');
 
@@ -193,8 +192,6 @@ Route::get('/inventory/create', [InventoryProductController::class, 'create'])->
 Route::post('/inventory/store', [InventoryProductController::class, 'store'])->name('inventory.store');
 Route::put('/inventory/{id}', [InventoryProductController::class, 'update'])->name('inventory.update');
 Route::delete('/inventory/{id}', [InventoryProductController::class, 'destroy'])->name('inventory.destroy');
-
-Route::get('/add-item', [AddItemController::class, 'index'])->name('add-item');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/make-transaction', [MakeTransactionController::class, 'index'])

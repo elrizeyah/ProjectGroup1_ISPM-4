@@ -3,34 +3,33 @@ import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 import { router } from "@inertiajs/react";
 
-export default function Inventory1({ auth, products, lowStockProducts }) {
+export default function Inventory1({ products=[] }) {
   const [search, setSearch] = useState('');
 
   return (
     <AuthenticatedLayout
-      user={auth.user}
       header={<h1
-                        className="text-4xl font-extrabold text-[#4b2e17] drop-shadow-sm"
-                        style={{
-                            WebkitTextStroke: ".8px #000000",
-                            backgroundImage: "linear-gradient(to bottom, #ec8845ff, #3b1f0d)",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            lineHeight: "1.3",
-                            fontSize: "3rem",
-                            marginLeft: "5rem",
-                            marginTop: "-2rem",
-                            marginBottom: "-1rem",
-                        }}
-                    >
-                        Inventory Management
-                    </h1>}
+                className="text-4xl font-extrabold text-[#4b2e17] drop-shadow-sm"
+                style={{
+                    WebkitTextStroke: ".8px #000000",
+                    backgroundImage: "linear-gradient(to bottom, #ec8845ff, #3b1f0d)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    lineHeight: "1.3",
+                    fontSize: "3rem",
+                    marginLeft: "5rem",
+                    marginTop: "-2rem",
+                    marginBottom: "-1rem",
+                }}
+            >
+                Inventory Management
+            </h1>}
     >
       <Head title="Inventory Management" />
 
   {/* Add Product Button */}
 <button
-  onClick={() => router.visit("/inventory/create")} // 👈 navigates to Add Product page
+  onClick={() => router.visit("/add-product")} // 👈 navigates to Add Product page
   className="w-full sm:w-[68rem] bg-[#fff2e0] border border-black
   font-semibold text-black text-2xl py-3 text-left pl-6
   hover:bg-[#e8d4b8] transition-all duration-200"
@@ -79,17 +78,17 @@ export default function Inventory1({ auth, products, lowStockProducts }) {
         </tr>
       </thead>
       <tbody>
-        {products?.length > 0 ? (
-          products.map((p, i) => (
-            <tr key={i} className={i % 2 === 0 ? 'bg-gray-100' : 'bg-white'}>
+        {products.length > 0 && (
+          products.map((item) => (
+            <tr key={item.id} className={item.id % 2 === 0 ? 'bg-gray-100' : 'bg-white'}>
               <td className="px-3 py-2">
-                <img src={p.image || '/images/sample.png'} alt={p.name} className="w-12 h-12 rounded-md" />
+                <img src={`/${item.file_path}`} alt={item.name} className="w-12 h-12 rounded-md" onError={(e) => e.target.style.display = "none"}/>
               </td>
-              <td className="px-3 py-2 text-sm text-gray-700">{p.product_no}</td>
-              <td className="px-3 py-2 text-sm text-gray-700">{p.category}</td>
-              <td className="px-3 py-2 text-sm text-gray-700">{p.name}</td>
-              <td className="px-3 py-2 text-sm text-gray-700">₱ {p.price}</td>
-              <td className="px-3 py-2 text-sm text-gray-700">{p.quantity}</td>
+              <td className="px-3 py-2 text-sm text-gray-700">{item.id}</td>
+              <td className="px-3 py-2 text-sm text-gray-700">{item.category}</td>
+              <td className="px-3 py-2 text-sm text-gray-700">{item.name}</td>
+              <td className="px-3 py-2 text-sm text-gray-700">₱ {item.price}</td>
+              <td className="px-3 py-2 text-sm text-gray-700">{item.quantity}</td>
               <td className="px-3 py-2 flex items-center justify-center gap-3">
                 <i className="fa-solid fa-pen text-green-600 cursor-pointer"></i>
                 <i className="fa-solid fa-trash text-red-600 cursor-pointer"></i>
@@ -97,18 +96,11 @@ export default function Inventory1({ auth, products, lowStockProducts }) {
               </td>
             </tr>
           ))
-        ) : (
-          <tr>
-            <td colSpan="7" className="text-center py-3 text-gray-500 italic">
-              No products found.
-            </td>
-          </tr>
         )}
       </tbody>
     </table>
   </div>
-
-{/* Inventory Table */}
+  {/* Inventory Table */}
   <h2 className="text-3xl font-bold text-black mb-3 mt-8">Products Low In Stock!</h2>
   <div className="border border-[#4b2e17] bg-white shadow-[5px_5px_0px_gray] p-4 overflow-x-auto w-[68rem]">
     <div className="flex flex-wrap gap-4 mb-3">
@@ -146,30 +138,26 @@ export default function Inventory1({ auth, products, lowStockProducts }) {
         </tr>
       </thead>
       <tbody>
-        {products?.length > 0 ? (
-          products.map((p, i) => (
-            <tr key={i} className={i % 2 === 0 ? 'bg-gray-100' : 'bg-white'}>
+        {products.length > 0 && (
+          products.filter((item) => item.quantity <= 20)
+            .map((item) => (
+            <tr key={item.id} className={item.id % 2 === 0 ? 'bg-gray-100' : 'bg-white'}>
               <td className="px-3 py-2">
-                <img src={p.image || '/images/sample.png'} alt={p.name} className="w-12 h-12 rounded-md" />
+                <img src={`/${item.file_path}`} alt={item.name} className="w-12 h-12 rounded-md" onError={(e) => e.target.style.display = "none"}/>
               </td>
-              <td className="px-3 py-2 text-sm text-gray-700">{p.product_no}</td>
-              <td className="px-3 py-2 text-sm text-gray-700">{p.category}</td>
-              <td className="px-3 py-2 text-sm text-gray-700">{p.name}</td>
-              <td className="px-3 py-2 text-sm text-gray-700">₱ {p.price}</td>
-              <td className="px-3 py-2 text-sm text-gray-700">{p.quantity}</td>
+              <td className="px-3 py-2 text-sm text-gray-700">{item.id}</td>
+              <td className="px-3 py-2 text-sm text-gray-700">{item.category}</td>
+              <td className="px-3 py-2 text-sm text-gray-700">{item.name}</td>
+              <td className="px-3 py-2 text-sm text-gray-700">₱ {item.price}</td>
+              <td className="px-3 py-2 text-sm text-gray-700">{item.quantity}</td>
               <td className="px-3 py-2 flex items-center justify-center gap-3">
                 <i className="fa-solid fa-pen text-green-600 cursor-pointer"></i>
                 <i className="fa-solid fa-trash text-red-600 cursor-pointer"></i>
                 <i className="fa-solid fa-eye text-gray-700 cursor-pointer"></i>
               </td>
             </tr>
+            
           ))
-        ) : (
-          <tr>
-            <td colSpan="7" className="text-center py-3 text-gray-500 italic">
-              No products found.
-            </td>
-          </tr>
         )}
       </tbody>
     </table>
@@ -180,3 +168,4 @@ export default function Inventory1({ auth, products, lowStockProducts }) {
     </AuthenticatedLayout>
   );
 }
+
