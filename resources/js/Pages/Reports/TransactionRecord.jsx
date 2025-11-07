@@ -72,9 +72,6 @@ export default function TransactionRecord({ transactions }) {
                   <th className="border border-gray-700 px-3 py-2">
                     Total Amount
                   </th>
-                  <th className="border border-gray-700 px-3 py-2">
-                    Payment Method
-                  </th>
                   <th className="border border-gray-700 px-3 py-2"></th>
                 </tr>
               </thead>
@@ -91,13 +88,10 @@ export default function TransactionRecord({ transactions }) {
                         #{t.id.toString().padStart(10, "0")}
                       </td>
                       <td className="border border-gray-400 px-3 py-2 text-[#2e1a0e]">
-                        {t.date || "9/28/2025 - 4:37 PM"}
+                        {new Date(t.created_at).toLocaleString()}
                       </td>
                       <td className="border border-gray-400 px-3 py-2 text-[#2e1a0e]">
-                        ₱ {t.amount?.toLocaleString() || "5,000.00"}
-                      </td>
-                      <td className="border border-gray-400 px-3 py-2 text-[#2e1a0e]">
-                        {t.method || (i % 2 === 0 ? "Cash" : "Card")}
+                        ₱ {t.total_amount}
                       </td>
                       <td className="border border-gray-400 px-3 py-2 text-center">
   <button
