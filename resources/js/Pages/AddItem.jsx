@@ -119,7 +119,6 @@ export default function AddItem({ products=[] }) {
 
                                         <td className="py-2 text-center">
                                             <input type="number" min="1" value={quantities[product.id] || 1} onChange={(e) => handleQuantityChange(product.id, e.target.value)} />
-                                            <button onClick={() => addToCart(product)}>Add to Cart</button>
                                         </td>
                                     </tr>
                                 ))}
