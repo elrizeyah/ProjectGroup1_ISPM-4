@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Product;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 
@@ -52,4 +52,13 @@ class TransactionController extends Controller
             'transaction' => $transaction,
         ]);
     }
+
+
+    public function createTransaction()
+    {
+        $products = Product::all();
+        return Inertia::render('AddItem', [
+            'products' => $products,
+        ]);
+    }   
 }

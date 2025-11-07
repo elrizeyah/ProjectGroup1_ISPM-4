@@ -1,52 +1,59 @@
 import React, { useState } from "react";
+
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, router } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 
-export default function AddItem({ auth, products }) {
-    const [cart, setCart] = useState([]);
+export default function AddItem({ products=[] }) {
+    const form = useForm({cart:[]});
+    const [quantities, setQuantities] = useState({});
 
-    // ✅ Update quantity in products and cart when user types in the input
-    const handleQuantityChange = (index, value) => {
-        const newProducts = [...products];
-        const quantity = parseInt(value) || 0;
-        newProducts[index].quantity = quantity;
-
-        // Update cart if product is already added
-        const cartIndex = cart.findIndex((item) => item.name === newProducts[index].name);
-        if (cartIndex !== -1) {
-            const newCart = [...cart];
-            newCart[cartIndex].quantity = quantity;
-            setCart(newCart);
+    const addToCart = (product) => {
+        const quantity = quantities[product.id] || 1;
+        const existingItem = form.data.cart.find(item => item.id === product.id);
+        if (!product || !product.id) {
+            alert('!product || !product.id');
         }
-    };
-
-    const handleAddToCart = (product) => {
-        if (product.stock === 0) {
-            alert(`${product.name} is out of stock!`);
-            return;
-        }
-
-        const existing = cart.find((item) => item.name === product.name);
-        if (existing) {
-            existing.quantity += 1;
-            setCart([...cart]);
+        if (existingItem) {
+            form.setData('cart', form.data.cart.map(item =>
+                item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
+            ));
         } else {
-            setCart([...cart, { ...product, quantity: 1 }]);
+            form.setData('cart', [...form.data.cart, {...product, quantity}]);
         }
-    };
-
-    // ✅ Confirm button: send cart to MakeTransaction page
-    const handleConfirm = () => {
-        if (cart.length === 0) {
-            alert("Please add at least one item to proceed.");
+    }
+    const removeFromCart = (index) => {
+        const newCart = [...form.data.cart];
+        newCart.splice(index, 1);
+        form.setData('cart', newCart);
+    }
+    const clearCart= () =>{
+        form.setData('cart', []);
+    }
+    const submitProducts = (e) => {
+        e.preventDefault();
+        if (form.data.cart.length === 0) {
+            alert("Cart is empty!");
             return;
         }
+        
 
-        router.visit("/make-transaction", { data: { initialItems: cart } });
+        form.post(route("checkout"), {
+        onSuccess: () => clearCart(),
+        onError: (errors) => console.error("Checkout failed:", errors),
+        });
+    };
+
+    const handleQuantityChange = (productId, value) => {
+        
+        const qty = Math.max(1, Number(value));
+        setQuantities({...quantities, [productId]: qty});
+        form.setData('cart', form.data.cart.map(item =>
+        item.id === productId ? {...item, quantity: qty} : item
+    ));
     };
 
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AuthenticatedLayout>
             <Head title="Add Item" />
 
             <div className="py-12 px-6 flex flex-col items-center">
@@ -79,14 +86,14 @@ export default function AddItem({ auth, products }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {products.map((product, i) => (
-                                    <tr key={i} className="border-b border-gray-300">
+                                {products.map((product) => (
+                                    <tr key={product.id} className="border-b border-gray-300">
                                         <td className="py-2 flex items-center gap-2">
                                             <button
-                                                onClick={() => handleAddToCart(product)}
-                                                disabled={product.stock === 0}
+                                                onClick={() => addToCart(product)}
+                                                disabled={product.quantity === 0}
                                                 className={`text-[#4b2e17] text-lg font-bold rounded-full w-7 h-7 flex items-center justify-center border border-[#4b2e17] shadow-md transition ${
-                                                    product.stock === 0
+                                                    product.quantity === 0
                                                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                                                         : "bg-[#e6d6c3] hover:bg-[#d4c0aa]"
                                                 }`}
@@ -99,9 +106,9 @@ export default function AddItem({ auth, products }) {
                                         <td className="py-2">₱{product.price}</td>
 
                                         <td className="py-2 text-center">
-                                            {product.stock > 0 ? (
+                                            {product.quantity > 0 ? (
                                                 <span className="text-green-700 font-semibold">
-                                                    {product.stock}
+                                                    {product.quantity}
                                                 </span>
                                             ) : (
                                                 <span className="text-red-500 text-sm">
@@ -111,14 +118,8 @@ export default function AddItem({ auth, products }) {
                                         </td>
 
                                         <td className="py-2 text-center">
-                                            <input
-                                                type="number"
-                                                min="0"
-                                                className="w-16 border border-gray-400 px-2 py-1 text-center"
-                                                onChange={(e) =>
-                                                    handleQuantityChange(i, e.target.value)
-                                                }
-                                            />
+                                            <input type="number" min="1" value={quantities[product.id] || 1} onChange={(e) => handleQuantityChange(product.id, e.target.value)} />
+                                            <button onClick={() => addToCart(product)}>Add to Cart</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -133,11 +134,11 @@ export default function AddItem({ auth, products }) {
                                 🛒 Cart
                             </h2>
 
-                            {cart.length === 0 ? (
+                            {form.data.cart.length === 0 ? (
                                 <p className="text-gray-600 text-sm">No items added yet.</p>
                             ) : (
                                 <div className="flex flex-col gap-3">
-                                    {cart.map((item, index) => (
+                                    {form.data.cart.map((item, index) => (
                                         <div
                                             key={index}
                                             className="bg-white border border-gray-300 rounded-md p-3 shadow-sm flex justify-between items-start"
@@ -149,9 +150,7 @@ export default function AddItem({ auth, products }) {
                                             </div>
 
                                             <button
-                                                onClick={() =>
-                                                    setCart(cart.filter((_, i) => i !== index))
-                                                }
+                                                onClick={() => removeFromCart(index)}
                                                 className="text-red-500 hover:text-red-700 transition"
                                                 title="Remove item"
                                             >
@@ -164,15 +163,15 @@ export default function AddItem({ auth, products }) {
                         </div>
 
                         <button
-    onClick={handleConfirm}
-    disabled={cart.length === 0}
-    className={`bg-[#4b2e17] text-white py-2 rounded-md mt-4 transition ${
-        cart.length === 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-[#3b2412]"
-    }`}
-    href="/make-transaction" // ✅ Added href
->
-    Confirm
-</button>
+                            onClick={submitProducts}
+                            disabled={form.data.cart.length === 0}
+                            className={`bg-[#4b2e17] text-white py-2 rounded-md mt-4 transition ${
+                                form.data.cart.length === 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-[#3b2412]"
+                            }`}
+                            href="/make-transaction" // ✅ Added href
+                        >
+                            Confirm
+                        </button>
 
                     </div>
                 </div>

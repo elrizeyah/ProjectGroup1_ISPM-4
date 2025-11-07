@@ -238,6 +238,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/add-capital', [InventoryController::class, 'addCapital'])->name('add-capital');
     Route::post('/checkout', [InventoryController::class, 'checkout'])->name('checkout');
     Route::post('/import', [ExcelController::class, 'import'])->name('import');
+    Route::get('/create-transaction', [TransactionController::class, 'createTransaction'])->name('create-transaction');
 
 });
 

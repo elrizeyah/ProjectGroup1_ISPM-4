@@ -7,7 +7,7 @@ export default function MakeTransaction({ auth, initialItems }) {
     const [items, setItems] = useState(initialItems || []);
 
     const handleAddClick = () => {
-        router.visit("/add-item");
+        router.visit("/create-transaction");
     };
 
     const totalAmount = items.reduce(
