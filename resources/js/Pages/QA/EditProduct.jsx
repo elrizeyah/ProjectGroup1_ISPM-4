@@ -2,27 +2,30 @@ import React from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm } from "@inertiajs/react";
 
-export default function AddProduct() {
-const {
-    data: productData,
-    setData: setProduct,
-    post: postProduct,
-    processing: processingProduct,
-    reset: resetForm,
-  } = useForm({
-    name: "",
-    quantity: "",
-    price: "",
-    category: "",
-    is_archived: false,
-    file: null,
-  });
+export default function EditProduct( {product} ) {
+    const {
+            data: productData,
+            setData: setProduct,
+            post: postProduct,
+            processing: processingEditProduct,
+            reset: resetForm,
+        } = useForm({
+            name: product.name || "",
+            quantity: product.quantity || "",
+            price: product.price || "",
+            category: product.category || "",
+            is_archived: product.is_archived || false,
+            file: null,
+        });
 
-   const submitProducts = (e) => {
-    e.preventDefault();
-    postProduct(route("add-item"), {
-      onSuccess: () => {resetForm()}
-    });
+    const submitProducts = (e) => {
+        e.preventDefault();
+        postProduct(route("update-product", product.id), {
+            forceFormData: true,
+            onSuccess: () => {
+                resetForm();
+            },
+        });
     };
 
     return (
@@ -31,12 +34,13 @@ const {
 
             <div className="flex justify-center py-12 px-4">
                 <form
-                    onSubmit={submitProducts}
+                    onSubmit={submitProducts} 
+                    encType="multipart/form-data"
                     className="bg-[#fefaf7] border border-gray-300 rounded-2xl shadow-md w-full max-w-2xl"
                 >
                     {/* 🟤 Header */}
                     <div className="bg-[#f8ecdf] px-6 py-4 border-b border-gray-300 rounded-t-2xl">
-                        <h1 className="text-xl font-bold text-black">Add Product</h1>
+                        <h1 className="text-xl font-bold text-black">Edit Product</h1>
                     </div>
 
                     {/* 🟤 Form Fields */}
@@ -44,7 +48,7 @@ const {
                         {/* Product Name + Change Image */}
                         <div>
                             <label className="font-semibold text-sm text-gray-800">
-                                Add Product Name
+                                Edit Product Name
                             </label>
                             <div className="flex items-center gap-2 mt-1">
                                 <input
@@ -126,7 +130,6 @@ const {
                             <input
                                 type="number"
                                 name="price"
-                                placeholder="₱ 00.00"
                                 className="mt-1 w-full border border-gray-400 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
                                 value={productData.price}
                                 onChange={(e) => setProduct("price", Number(e.target.value))}
@@ -145,10 +148,10 @@ const {
                         </button>
                         <button
                             type="submit"
-                            disabled={processingProduct}
+                            disabled={processingEditProduct}
                             className="bg-[#4b2e17] text-white px-5 py-2 rounded-sm font-semibold hover:bg-[#3a2211] transition"
                         >
-                            Add Product
+                            Edit Product
                         </button>
                     </div>
                 </form>

@@ -1,10 +1,27 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
+import { IconPencil, IconTrash, IconEye } from '@tabler/icons-react';
+import { Link } from '@inertiajs/react';
+import DeleteButton from '@/Components/DeleteButton';
 import { useState } from 'react';
 import { router } from "@inertiajs/react";
 
 export default function Inventory1({ products=[] }) {
   const [search, setSearch] = useState('');
+
+  const edit = (id) => router.get(route("edit-product", id));
+  const del = (id) => {
+    if (confirm("Are you sure you want to delete this product?")) {
+      router.post(route("delete-item", id), {
+        onSuccess: () => {
+          console.log("Product deleted successfully");
+        },
+        onError: (errors) => {
+          console.error("Error deleting product:", errors);
+        },
+      });
+    }
+  }
 
   return (
     <AuthenticatedLayout
@@ -90,9 +107,9 @@ export default function Inventory1({ products=[] }) {
               <td className="px-3 py-2 text-sm text-gray-700">₱ {item.price}</td>
               <td className="px-3 py-2 text-sm text-gray-700">{item.quantity}</td>
               <td className="px-3 py-2 flex items-center justify-center gap-3">
-                <i className="fa-solid fa-pen text-green-600 cursor-pointer"></i>
-                <i className="fa-solid fa-trash text-red-600 cursor-pointer"></i>
-                <i className="fa-solid fa-eye text-gray-700 cursor-pointer"></i>
+                  <i className="fa-solid fa-pen text-green-600 cursor-pointer"><IconPencil onClick={() => edit(item.id)} /></i>
+                  <i className="fa-solid fa-trash text-red-600 cursor-pointer"><IconTrash onClick={() => del(item.id)} /></i>
+                  <i className="fa-solid fa-eye text-gray-700 cursor-pointer"><Link><IconEye /></Link></i>
               </td>
             </tr>
           ))
@@ -151,9 +168,9 @@ export default function Inventory1({ products=[] }) {
               <td className="px-3 py-2 text-sm text-gray-700">₱ {item.price}</td>
               <td className="px-3 py-2 text-sm text-gray-700">{item.quantity}</td>
               <td className="px-3 py-2 flex items-center justify-center gap-3">
-                <i className="fa-solid fa-pen text-green-600 cursor-pointer"></i>
-                <i className="fa-solid fa-trash text-red-600 cursor-pointer"></i>
-                <i className="fa-solid fa-eye text-gray-700 cursor-pointer"></i>
+                <i className="fa-solid fa-pen text-green-600 cursor-pointer"><IconPencil /></i>
+                <i className="fa-solid fa-trash text-red-600 cursor-pointer"><IconTrash /></i>
+                <i className="fa-solid fa-eye text-gray-700 cursor-pointer"><IconEye /></i>
               </td>
             </tr>
             

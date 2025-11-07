@@ -207,12 +207,9 @@ Route::get('/transaction-history', function () {
 })->name('transaction-history');
 
 Route::get('/add-product', function () {
-    $transactions = Transaction::latest()->take(10)->get();
-
-    return Inertia::render('QA/AddProduct', [
-        'transactions' => $transactions,
-    ]);
+    return Inertia::render('QA/AddProduct');
 })->name('add-product');
+
 
 Route::get('/generate-report', function () {
     $transactions = Transaction::latest()->take(10)->get();
@@ -233,7 +230,7 @@ Route::middleware('auth')->group(function () {
     })->name('transactiondetails');
     Route::put('/update-item-inc/{id}', [InventoryController::class, 'updateItemInc'])->name('update-iteminc');
     Route::put('/update-item-dec/{id}', [InventoryController::class, 'updateItemDec'])->name('update-itemdec');
-    Route::get('/edit-product/{id}', [InventoryController::class, 'editProduct'])->name('edit-product');
+    Route::get('/edit-product/{id}', [AddProductController::class, 'editProduct'])->name('edit-product');
     Route::post('/update-product/{id}', [InventoryController::class, 'updateProduct'])->name('update-product');
     Route::post('/edit-item/{id}', [InventoryController::class, 'editItem'])->name('edit-item');
     Route::post('/delete-item/{id}', [InventoryController::class, 'deleteItem'])->name('delete-item');
