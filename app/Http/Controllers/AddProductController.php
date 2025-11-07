@@ -15,12 +15,4 @@ class AddProductController extends Controller
             'products' => $products,
         ]);
     }
-
-    public function editProduct($id)
-    {
-        $product = Product::findOrFail($id);
-        return Inertia::render('QA/EditProduct', [
-            'product' => $product,
-        ]);
-    }
 }

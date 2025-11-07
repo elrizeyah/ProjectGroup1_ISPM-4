@@ -1,37 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm } from "@inertiajs/react";
 
-export default function AddProduct() {
-const {
-    data: productData,
-    setData: setProduct,
-    post: postProduct,
-    processing: processingProduct,
-    reset: resetForm,
-  } = useForm({
-    name: "",
-    quantity: "",
-    price: "",
-    category: "",
-    is_archived: false,
-    file: null,
-  });
-
-   const submitProducts = (e) => {
-    e.preventDefault();
-    postProduct(route("add-item"), {
-      onSuccess: () => {resetForm()}
+export default function AddProduct({ auth }) {
+    const { data, setData, post, processing, reset } = useForm({
+        name: "",
+        category: "",
+        quantity: 0,
+        price: "",
+        image: null,
     });
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        post(route("products.store"), {
+            onSuccess: () => reset(),
+        });
+    };
+
+    const handleImageChange = (e) => {
+        setData("image", e.target.files[0]);
     };
 
     return (
-        <AuthenticatedLayout>
+        <AuthenticatedLayout user={auth.user}>
             <Head title="Add Product" />
 
             <div className="flex justify-center py-12 px-4">
                 <form
-                    onSubmit={submitProducts}
+                    onSubmit={handleSubmit}
                     className="bg-[#fefaf7] border border-gray-300 rounded-2xl shadow-md w-full max-w-2xl"
                 >
                     {/* 🟤 Header */}
@@ -49,16 +46,15 @@ const {
                             <div className="flex items-center gap-2 mt-1">
                                 <input
                                     type="text"
-                                    name="name"
                                     className="flex-1 border border-gray-400 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
-                                    value={productData.name}
-                                    onChange={(e) => setProduct("name", e.target.value)}
+                                    value={data.name}
+                                    onChange={(e) => setData("name", e.target.value)}
                                 />
                                 <label className="text-sm bg-gray-200 px-3 py-2 border border-gray-400 rounded cursor-pointer hover:bg-gray-300 transition">
                                     <input
                                         type="file"
                                         accept="image/*"
-                                        onChange={(e) => setProduct("file", e.target.files[0])}
+                                        onChange={handleImageChange}
                                         className="hidden"
                                     />
                                     <span role="img" aria-label="camera">📷</span> Change Image
@@ -72,10 +68,9 @@ const {
                                 Add Category
                             </label>
                             <select
-                                name="category"
                                 className="mt-1 w-full border border-gray-400 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
-                                value={productData.category}
-                                onChange={(e) => setProduct("category", e.target.value)}
+                                value={data.category}
+                                onChange={(e) => setData("category", e.target.value)}
                             >
                                 <option value="">Select category</option>
                                 <option value="chocolate">Chocolate</option>
@@ -93,7 +88,7 @@ const {
                                 <button
                                     type="button"
                                     onClick={() =>
-                                        setProduct("quantity", Math.max(0, productData.quantity - 1))
+                                        setData("quantity", Math.max(0, data.quantity - 1))
                                     }
                                     className="border border-gray-400 px-3 py-1 rounded hover:bg-gray-200"
                                 >
@@ -101,15 +96,14 @@ const {
                                 </button>
                                 <input
                                     type="number"
-                                    name="quantity"
-                                    value={productData.quantity} 
-                                    onChange={(e) => setProduct("quantity", Number(e.target.value))}
+                                    value={data.quantity}
+                                    onChange={(e) => setData("quantity", e.target.value)}
                                     className="w-full border border-gray-400 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
                                 />
                                 <button
                                     type="button"
                                     onClick={() =>
-                                        setProduct("quantity", parseInt(productData.quantity || 0) + 1)
+                                        setData("quantity", parseInt(data.quantity || 0) + 1)
                                     }
                                     className="border border-gray-400 px-3 py-1 rounded hover:bg-gray-200"
                                 >
@@ -124,12 +118,11 @@ const {
                                 Indicate Price
                             </label>
                             <input
-                                type="number"
-                                name="price"
+                                type="text"
                                 placeholder="₱ 00.00"
                                 className="mt-1 w-full border border-gray-400 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
-                                value={productData.price}
-                                onChange={(e) => setProduct("price", Number(e.target.value))}
+                                value={data.price}
+                                onChange={(e) => setData("price", e.target.value)}
                             />
                         </div>
                     </div>
@@ -138,14 +131,14 @@ const {
                     <div className="flex justify-end items-center gap-4 px-6 py-4 border-t border-gray-300">
                         <button
                             type="button"
-                            onClick={resetForm}
+                            onClick={() => reset()}
                             className="text-sm font-semibold text-black hover:underline"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
-                            disabled={processingProduct}
+                            disabled={processing}
                             className="bg-[#4b2e17] text-white px-5 py-2 rounded-sm font-semibold hover:bg-[#3a2211] transition"
                         >
                             Add Product

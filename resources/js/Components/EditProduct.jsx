@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "@inertiajs/react";
 
-export default function EditProduct({ product = [] }) {
+export default function EditProduct({ product = {} }) {
     const [visible, setVisible] = useState(false);
     const {
         data: productData,

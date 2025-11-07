@@ -5,7 +5,7 @@ import { Head, router } from "@inertiajs/react";
 export default function AddItem({ auth, products }) {
     const [cart, setCart] = useState([]);
 
-    // ✅ Update quantity in products and cart when user types in the input
+    //Update quantity in products and cart when user types in the input
     const handleQuantityChange = (index, value) => {
         const newProducts = [...products];
         const quantity = parseInt(value) || 0;
